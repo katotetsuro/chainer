@@ -84,11 +84,20 @@ add_library(chainerx SHARED
     thread_local_state.cc
     )
 
+if(APPLE)
+  set(all_archive_option -all_load)
+  set(no_all_archive_option -noall_load)
+else()
+  set(all_archive_option --whole-archive)
+  set(no_all_archive_option --no-whole-archive)
+endif()
+
 target_link_libraries(chainerx
     PUBLIC
     ${CMAKE_DL_LIBS}
     PRIVATE
-    -Wl,--whole-archive)
+    -Wl,${all_archive_option})
+
 target_link_libraries(chainerx PRIVATE chainerx_routines)
 target_link_libraries(chainerx PRIVATE chainerx_native)
 target_link_libraries(chainerx PRIVATE chainerx_testing)
@@ -97,7 +106,7 @@ if(${CUDA_FOUND})
 endif()
 target_link_libraries(chainerx
     PRIVATE
-    -Wl,--no-whole-archive)
+    -Wl,${no_all_archive_option})
 install(TARGETS chainerx DESTINATION lib)
 
 if(${CHAINERX_BUILD_TEST})

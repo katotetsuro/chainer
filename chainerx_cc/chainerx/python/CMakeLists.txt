@@ -21,10 +21,15 @@ add_library(_core.so MODULE
     testing/device_buffer.cc
     testing/testing_module.cc
     )
+if(APPLE)
+  set(just_symbol_option -rpath)
+else()
+  set(just_symbol_option -R)
+endif()
 target_link_libraries(_core.so
     PRIVATE
     "-Wl,-flto" pybind11::module
-    "-Wl,-R,'$ORIGIN/.'" chainerx)
+    "-Wl,${just_symbol_option},'$ORIGIN/.'" chainerx)
 set_target_properties(_core.so
     PROPERTIES
     PREFIX "${PYTHON_MODULE_PREFIX}"

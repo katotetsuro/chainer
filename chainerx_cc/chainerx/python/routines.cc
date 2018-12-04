@@ -58,8 +58,12 @@ ArrayBodyPtr MakeArrayFromBuffer(py::buffer buffer, py::handle dtype, int64_t co
         throw ChainerxError{"offset must be non-negative and no greater than buffer length (", n_bytes, ")"};
     }
 
-    if (!internal::IsContiguous(Shape{info.shape}, Strides{info.strides}, info.itemsize)) {
-        throw ChainerxError{"ndarray is not C-contiguous"};
+    {
+        std::vector<int64_t> shape(info.shape.begin(), info.shape.end());
+        std::vector<int64_t> strides(info.strides.begin(), info.strides.end());
+        if (!internal::IsContiguous(Shape{shape}, Strides{strides}, info.itemsize)) {
+            throw ChainerxError{"ndarray is not C-contiguous"};
+        }
     }
 
     n_bytes -= offset;
